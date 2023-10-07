@@ -227,7 +227,7 @@ impl Application {
         if settings.valthrun_watermark {
             {
                 let text_buf;
-                let text = obfstr!(text_buf = "Valthrun Overlay");
+                let text = obfstr!(text_buf = "Valthrun FPS Display");//org:"Valthrun Overlay"
 
                 ui.set_cursor_pos([
                     ui.window_size()[0] - ui.calc_text_size(text)[0] - 10.0,
@@ -492,7 +492,7 @@ fn main_overlay() -> anyhow::Result<()> {
 
     log::debug!("Initialize overlay");
     // OverlayError
-    let mut overlay = match overlay::init(obfstr!("CS2 Overlay"), obfstr!("Counter-Strike 2")) {
+    let mut overlay = match overlay::init(obfstr!("CS2 Overlay"), "反恐精英：全球攻势") {//org:obfstr!("Counter-Strike 2")
         Err(OverlayError::VulkanDllNotFound(LoadingError::LibraryLoadFailure(source))) => {
             match &source {
                 libloading::Error::LoadLibraryExW { .. } => {

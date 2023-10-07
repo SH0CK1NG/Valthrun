@@ -1,0 +1,14 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\controller",
+    "\\controller\\src",
+    "\\controller\\src\\enhancements",
+    "\\controller\\src\\settings",
+    "\\controller\\src\\settings_ui",
+    "\\overlay",
+    "\\overlay\\src"
+  ],
+  "SelectedNode": "\\controller\\src\\main.rs",
+  "PreviewInSolutionExplorer": false
+}

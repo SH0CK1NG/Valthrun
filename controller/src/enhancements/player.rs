@@ -188,6 +188,19 @@ impl Enhancement for PlayerESP {
             }
         }
 
+        if let Some(hotkey) = &settings.esp_press {//org:new add
+            if ui.is_key_pressed(hotkey.0) {
+                log::debug!("Press player ESP");
+                settings.esp = true;
+                updated = true;
+            }
+            if ui.is_key_released(hotkey.0) {
+                log::debug!("Release player ESP");
+                settings.esp = false;
+                updated = true;
+            }
+        }
+
         Ok(updated)
     }
 

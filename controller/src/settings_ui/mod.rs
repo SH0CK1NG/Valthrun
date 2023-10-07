@@ -161,10 +161,10 @@ impl SettingsUI {
 
                         if settings.esp {
                             ui.checkbox(obfstr!("ESP Boxes"), &mut settings.esp_boxes);
-                            ui.slider_config("Box Thickness", 0.1, 10.0)
+                            ui.slider_config("Box Thickness", 0.01, 10.0)//org:("Box Thickness", 0.1, 10.0)
                                 .build(&mut settings.esp_boxes_thickness);
                             ui.checkbox(obfstr!("ESP Skeletons"), &mut settings.esp_skeleton);
-                            ui.slider_config("Skeleton Thickness", 0.1, 10.0)
+                            ui.slider_config("Skeleton Thickness", 0.01, 10.0)//org:("Skeleton Thickness", 0.1, 10.0)
                                 .build(&mut settings.esp_skeleton_thickness);
                             ui.checkbox(obfstr!("Display player health"), &mut settings.esp_health);
 
