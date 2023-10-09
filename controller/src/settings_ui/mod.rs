@@ -154,6 +154,7 @@ impl SettingsUI {
                     if let Some(_) = ui.tab_item("Hotkeys") {
                         ui.button_key("Toggle Settings", &mut settings.key_settings, [150.0, 0.0]);
                         ui.button_key_optional("ESP toggle", &mut settings.esp_toogle, [ 150.0, 0.0 ]);
+                        ui.button_key_optional("ESP press", &mut settings.esp_press, [ 150.0, 0.0 ]);//org:new add
                     }
 
                     if let Some(_tab) = ui.tab_item("Visuals") {

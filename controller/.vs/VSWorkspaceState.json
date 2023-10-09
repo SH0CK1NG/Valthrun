@@ -1,0 +1,12 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\src",
+    "\\src\\enhancements",
+    "\\src\\settings",
+    "\\src\\settings_ui",
+    "\\src\\view"
+  ],
+  "SelectedNode": "\\src\\enhancements\\mod.rs",
+  "PreviewInSolutionExplorer": false
+}
