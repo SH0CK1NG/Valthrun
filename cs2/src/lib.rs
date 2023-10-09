@@ -1,8 +1,3 @@
-#![feature(pointer_byte_offsets)]
-#![feature(maybe_uninit_uninit_array)]
-#![feature(const_trait_impl)]
-#![feature(iterator_try_collect)]
-
 mod handle;
 pub use handle::*;
 
@@ -19,9 +14,6 @@ pub use schema::*;
 
 mod model;
 pub use model::*;
-
-mod ptr;
-pub use ptr::*;
 
 mod globals;
 pub use globals::*;

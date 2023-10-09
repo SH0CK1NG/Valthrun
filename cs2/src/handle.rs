@@ -1,23 +1,42 @@
 #![allow(dead_code)]
 
-use anyhow::Context;
-use cs2_schema_declaration::{MemoryDriver, MemoryHandle, SchemaValue};
-use obfstr::obfstr;
 use std::{
     any::Any,
     ffi::CStr,
     fmt::Debug,
-    sync::{Arc, Weak},
-};
-use valthrun_kernel_interface::{
-    requests::{
-        RequestCSModule, RequestKeyboardState, RequestMouseMove, RequestProtectionToggle,
-        ResponseCsModule,
+    sync::{
+        Arc,
+        Weak,
     },
-    CS2ModuleInfo, KInterfaceError, KernelInterface, KeyboardState, ModuleInfo, MouseState,
 };
 
-use crate::{Signature, SignatureType};
+use anyhow::Context;
+use cs2_schema_declaration::{
+    MemoryDriver,
+    MemoryHandle,
+    SchemaValue,
+};
+use obfstr::obfstr;
+use valthrun_kernel_interface::{
+    requests::{
+        RequestCSModule,
+        RequestKeyboardState,
+        RequestMouseMove,
+        RequestProtectionToggle,
+        ResponseCsModule,
+    },
+    CS2ModuleInfo,
+    KInterfaceError,
+    KernelInterface,
+    KeyboardState,
+    ModuleInfo,
+    MouseState,
+};
+
+use crate::{
+    Signature,
+    SignatureType,
+};
 
 pub struct CSMemoryDriver(Weak<CS2Handle>);
 impl MemoryDriver for CSMemoryDriver {
@@ -28,6 +47,16 @@ impl MemoryDriver for CSMemoryDriver {
     fn read_slice(&self, address: u64, slice: &mut [u8]) -> anyhow::Result<()> {
         let cs2 = self.0.upgrade().context("cs2 handle has been dropped")?;
         cs2.read_slice(&[address], slice)
+    }
+
+    fn read_cstring(
+        &self,
+        address: u64,
+        expected_length: Option<usize>,
+        _max_length: Option<usize>,
+    ) -> anyhow::Result<String> {
+        let cs2 = self.0.upgrade().context("cs2 handle has been dropped")?;
+        cs2.read_string(&[address], expected_length)
     }
 }
 
@@ -62,7 +91,7 @@ pub struct CS2Handle {
 
 impl CS2Handle {
     pub fn create() -> anyhow::Result<Arc<Self>> {
-        let interface = KernelInterface::create(obfstr!("\\\\.\\valthrun"))?;
+        let interface = KernelInterface::create(obfstr!("\\\\.\\GLOBALROOT\\Device\\valthrun"))?;
 
         /*
          * Please no not analyze me:
@@ -70,9 +99,10 @@ impl CS2Handle {
          *
          * Even tough we don't have open handles to CS2 we don't want anybody to read our process.
          */
-        interface.execute_request(&RequestProtectionToggle { enabled: true })?;
+        unsafe { interface.execute_request(&RequestProtectionToggle { enabled: true }) }?;
 
-        let module_info = interface.execute_request::<RequestCSModule>(&RequestCSModule {})?;
+        let module_info =
+            unsafe { interface.execute_request::<RequestCSModule>(&RequestCSModule {}) }?;
         let module_info = match module_info {
             ResponseCsModule::Success(info) => info,
             ResponseCsModule::NoProcess => return Err(KInterfaceError::ProcessDoesNotExists.into()),
@@ -106,25 +136,31 @@ impl CS2Handle {
     }
 
     pub fn protect_process(&self) -> anyhow::Result<()> {
-        self.ke_interface
-            .execute_request(&RequestProtectionToggle { enabled: true })?;
+        unsafe {
+            self.ke_interface
+                .execute_request(&RequestProtectionToggle { enabled: true })
+        }?;
         Ok(())
     }
 
     pub fn send_keyboard_state(&self, states: &[KeyboardState]) -> anyhow::Result<()> {
-        self.ke_interface.execute_request(&RequestKeyboardState {
-            buffer: states.as_ptr(),
-            state_count: states.len(),
-        })?;
+        unsafe {
+            self.ke_interface.execute_request(&RequestKeyboardState {
+                buffer: states.as_ptr(),
+                state_count: states.len(),
+            })
+        }?;
 
         Ok(())
     }
 
     pub fn send_mouse_state(&self, states: &[MouseState]) -> anyhow::Result<()> {
-        self.ke_interface.execute_request(&RequestMouseMove {
-            buffer: states.as_ptr(),
-            state_count: states.len(),
-        })?;
+        unsafe {
+            self.ke_interface.execute_request(&RequestMouseMove {
+                buffer: states.as_ptr(),
+                state_count: states.len(),
+            })
+        }?;
 
         Ok(())
     }
@@ -148,13 +184,13 @@ impl CS2Handle {
             + offset)
     }
 
-    pub fn read_sized<T>(&self, offsets: &[u64]) -> anyhow::Result<T> {
+    pub fn read_sized<T: Copy>(&self, offsets: &[u64]) -> anyhow::Result<T> {
         Ok(self
             .ke_interface
             .read(self.module_info.process_id, offsets)?)
     }
 
-    pub fn read_slice<T: Sized>(&self, offsets: &[u64], buffer: &mut [T]) -> anyhow::Result<()> {
+    pub fn read_slice<T: Copy>(&self, offsets: &[u64], buffer: &mut [T]) -> anyhow::Result<()> {
         Ok(self
             .ke_interface
             .read_slice(self.module_info.process_id, offsets, buffer)?)

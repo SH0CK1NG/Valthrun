@@ -1,18 +1,35 @@
-use std::ffi::{c_void, CStr, CString};
+use std::ffi::{
+    c_void,
+    CStr,
+    CString,
+};
 
 use ash::{
     extensions::{
         ext::DebugUtils,
-        khr::{Surface, Swapchain as SwapchainLoader},
+        khr::{
+            Surface,
+            Swapchain as SwapchainLoader,
+        },
     },
-    vk, Device, Entry, Instance,
+    vk,
+    Device,
+    Entry,
+    Instance,
 };
 use imgui::DrawData;
 use imgui_rs_vulkan_renderer::Renderer;
 use imgui_winit_support::winit::window::Window;
-use raw_window_handle::{HasRawDisplayHandle, HasRawWindowHandle};
+use raw_window_handle::{
+    HasRawDisplayHandle,
+    HasRawWindowHandle,
+};
 
-use crate::{error::Result, vulkan_driver::get_vulkan_entry};
+use crate::{
+    error::Result,
+    vulkan_driver::get_vulkan_entry,
+    OverlayError,
+};
 
 const WIDTH: u32 = 1024;
 const HEIGHT: u32 = 768;
@@ -49,7 +66,8 @@ impl VulkanContext {
                 window.raw_display_handle(),
                 window.raw_window_handle(),
                 None,
-            )?
+            )
+            .map_err(OverlayError::VulkanSurfaceCreationFailed)?
         };
 
         // Vulkan physical device and queue families indices (graphics and present)
@@ -195,16 +213,26 @@ fn create_vulkan_instance(
     window: &Window,
     title: &str,
 ) -> crate::Result<(Instance, DebugUtils, vk::DebugUtilsMessengerEXT)> {
-    log::debug!("Creating vulkan instance");
+    let instance_version = match entry.try_enumerate_instance_version()? {
+        Some(version) => version,
+        None => vk::make_api_version(0, 1, 0, 0),
+    };
+    log::debug!(
+        "Detected vulkan version {}.{}.{}",
+        vk::api_version_major(instance_version),
+        vk::api_version_minor(instance_version),
+        vk::api_version_patch(instance_version)
+    );
+
     // Vulkan instance
     let app_name = CString::new(title)?;
     let engine_name = CString::new("No Engine")?;
     let app_info = vk::ApplicationInfo::builder()
         .application_name(app_name.as_c_str())
-        .application_version(vk::make_api_version(0, 0, 1, 0))
+        .application_version(0)
         .engine_name(engine_name.as_c_str())
-        .engine_version(vk::make_api_version(0, 0, 1, 0))
-        .api_version(vk::make_api_version(0, 1, 0, 0));
+        .engine_version(0)
+        .api_version(vk::make_api_version(0, 0, 1, 0));
 
     let mut extension_names =
         ash_window::enumerate_required_extensions(window.raw_display_handle())?.to_vec();
@@ -214,7 +242,12 @@ fn create_vulkan_instance(
         .application_info(&app_info)
         .enabled_extension_names(&extension_names);
 
-    let instance = unsafe { entry.create_instance(&instance_create_info, None)? };
+    log::debug!("Creating Vulkan instance");
+    let instance = unsafe {
+        entry
+            .create_instance(&instance_create_info, None)
+            .map_err(OverlayError::VulkanInstanceCreationFailed)?
+    };
 
     // Vulkan debug report
     let create_info = vk::DebugUtilsMessengerCreateInfoEXT::builder()
@@ -231,6 +264,8 @@ fn create_vulkan_instance(
         )
         .pfn_user_callback(Some(vulkan_debug_callback));
     let debug_utils = DebugUtils::new(entry, &instance);
+
+    log::debug!("Setup debug logging");
     let debug_utils_messenger =
         unsafe { debug_utils.create_debug_utils_messenger(&create_info, None)? };
 

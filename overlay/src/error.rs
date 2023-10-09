@@ -5,7 +5,10 @@ use imgui_winit_support::winit::error::OsError;
 use thiserror::Error;
 
 pub type Result<T> = std::result::Result<T, OverlayError>;
-pub use ash::{vk::Result as VkResult, LoadingError};
+pub use ash::{
+    vk::Result as VkResult,
+    LoadingError,
+};
 
 #[derive(Error, Debug)]
 pub enum OverlayError {
@@ -44,4 +47,10 @@ pub enum OverlayError {
 
     #[error("failed to write the vulkan dll")]
     VulkanDllError(std::io::Error),
+
+    #[error("failed to create a vulkan instance: {0}")]
+    VulkanInstanceCreationFailed(VkResult),
+
+    #[error("failed to create a vulkan surface: {0}")]
+    VulkanSurfaceCreationFailed(VkResult),
 }
