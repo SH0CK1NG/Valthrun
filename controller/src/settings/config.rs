@@ -72,6 +72,9 @@ pub struct AppSettings {
     #[serde(default = "default_key_none")]
     pub esp_toogle: Option<HotKey>,
 
+    #[serde(default = "default_key_none")]
+    pub esp_press: Option<HotKey>,//org:new add
+
     #[serde(default = "bool_true")]
     pub esp_skeleton: bool,
 

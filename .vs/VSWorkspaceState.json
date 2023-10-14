@@ -5,10 +5,12 @@
     "\\controller\\src",
     "\\controller\\src\\enhancements",
     "\\controller\\src\\settings",
-    "\\controller\\src\\settings_ui",
+    "\\cs2-schema",
+    "\\cs2-schema\\generated",
+    "\\cs2-schema\\generated\\src",
     "\\overlay",
     "\\overlay\\src"
   ],
-  "SelectedNode": "\\controller\\src\\main.rs",
+  "SelectedNode": "\\controller\\src\\enhancements\\player.rs",
   "PreviewInSolutionExplorer": false
 }
