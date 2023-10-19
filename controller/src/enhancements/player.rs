@@ -21,7 +21,6 @@ use cs2_schema_generated::cs2::client::{
     CModelState,
     CSkeletonInstance,
     C_CSPlayerPawn,
-    CCSPlayerController,
 };
 use obfstr::obfstr;
 

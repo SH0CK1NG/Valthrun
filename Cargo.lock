@@ -278,6 +278,7 @@ dependencies = [
  "chrono",
  "clap",
  "cs2",
+ "cs2-schema-cutl",
  "cs2-schema-declaration",
  "cs2-schema-generated",
  "env_logger",

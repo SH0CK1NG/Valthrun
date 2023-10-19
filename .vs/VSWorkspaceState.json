@@ -4,13 +4,14 @@
     "\\controller",
     "\\controller\\src",
     "\\controller\\src\\enhancements",
-    "\\controller\\src\\settings",
     "\\cs2-schema",
+    "\\cs2-schema\\cutl",
     "\\cs2-schema\\generated",
     "\\cs2-schema\\generated\\src",
     "\\overlay",
+    "\\overlay\\examples",
     "\\overlay\\src"
   ],
-  "SelectedNode": "\\controller\\src\\enhancements\\player.rs",
+  "SelectedNode": "\\controller\\src\\enhancements\\spectators_list.rs",
   "PreviewInSolutionExplorer": false
 }

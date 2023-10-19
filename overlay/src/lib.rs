@@ -149,7 +149,7 @@ fn create_window(event_loop: &EventLoop<()>, title: &str) -> Result<Window> {
             bb.fEnable = BOOL::from(true);
             bb.hRgnBlur = CreateRectRgn(0, 0, 1, 1);
             DwmEnableBlurBehindWindow(hwnd, &bb)?;
-
+                      
             // Move the window to the top
             SetWindowPos(
                 hwnd,

@@ -4,8 +4,9 @@
     "\\src",
     "\\src\\enhancements",
     "\\src\\settings",
+    "\\src\\utils",
     "\\src\\view"
   ],
-  "SelectedNode": "\\src\\enhancements\\bomb.rs",
+  "SelectedNode": "\\src\\enhancements\\player.rs",
   "PreviewInSolutionExplorer": false
 }

@@ -5,6 +5,21 @@ use cs2::CEntityIdentityEx;
 use cs2_schema_generated::cs2::client::{
     C_CSObserverPawn,
     C_CSPlayerPawnBase,
+    CCSPlayer_BulletServices,
+    CCSPlayerController_DamageServices,
+    C_BulletHitModel,
+};
+use cs2_schema_declaration::{
+    define_schema,
+    Ptr,
+};
+use std::collections::{
+    btree_map::Entry,
+    BTreeMap,
+};
+
+use cs2_schema_cutl::{
+    CUtlVector,
 };
 use obfstr::obfstr;
 
@@ -182,6 +197,35 @@ impl Enhancement for SpectatorsList {
             self.spectators.push(SpectatorInfo { spectator_name });
         }
 
+        let local_controller = ctx.cs2_entities.get_local_player_controller()?;
+        if local_controller.is_null()? {
+            return Ok(());
+        }
+        let local_pawn = ctx
+            .cs2_entities
+            .get_by_handle(&local_controller.reference_schema()?.m_hPlayerPawn()?)?
+            .context("missing local player pawn")?
+            .entity()?
+            .read_schema()?;
+
+        let local_hits = local_pawn
+            .m_pBulletServices()?
+            .cast::<CCSPlayer_BulletServices>()
+            .reference_schema()?
+            .m_totalHitsOnServer()?;
+        println!("local_hits: {}", local_hits);
+        //let hit = local_pawn
+        //    .m_vecBulletHitModels()?;
+        //    //.cast::<CUtlVector<Ptr<cs2_schema_generated::cs2::client::C_BulletHitModel>>>();
+        //    //.reference_schema()?;
+        //    //.m_bIsHit()?;
+        //println!("local_hits: {}", local_hits);
+        //let local_damage = local_player_controller
+        //    .m_pDamageServices()?
+        //    .cast::<CCSPlayerController_DamageServices>()
+        //    .reference_schema()?
+        //    .m_nSendUpdate()?;
+        //println!("local_damage: {:?}", local_damage);
         Ok(())
     }
 
